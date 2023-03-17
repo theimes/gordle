@@ -43,7 +43,8 @@ func (g *Game) Play() {
 			return
 		}
 
-		fmt.Printf("Your guess is: %s\n", string(guess))
+		fmt.Printf("%s", computeFeedback(guess, g.solution))
+
 	}
 
 	fmt.Printf("🙁 😜 You've lost. The solution was %q\n", string(g.solution))
@@ -79,6 +80,43 @@ func (g *Game) validateGuess(guess []rune) error {
 	return nil
 }
 
+// splitToUppercaseCharacters returns the input string as a slice of uppercased runes
 func splitToUppercaseCharacters(input string) []rune {
 	return []rune(strings.ToUpper(input))
+}
+
+// computeFeedback verifies every character of the guess against the solution
+func computeFeedback(guess, solution []rune) feedback {
+	result := make(feedback, len(guess))
+	used := make([]bool, len(solution))
+
+	if len(guess) != len(solution) {
+		_, _ = fmt.Fprintf(os.Stderr, "Internal error! Guess and solution have different lengths: %d vs %d", len(guess), len(solution))
+		return result
+	}
+
+	for i, character := range guess {
+		if character == solution[i] {
+			result[i] = correctPosition
+			used[i] = true
+		}
+	}
+
+	for i, character := range guess {
+		// omit characters that ain't in the solution
+		if result[i] != absentCharacter {
+			continue
+		}
+		for j, target := range solution {
+			if used[j] {
+				continue
+			}
+			if character == target {
+				result[i] = wrongPosition
+				used[j] = true
+				break
+			}
+		}
+	}
+	return result
 }

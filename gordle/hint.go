@@ -15,9 +15,9 @@ func (h hint) String() string {
 	case absentCharacter:
 		return "◽"
 	case wrongPosition:
-		return "🔕"
+		return "⚠️"
 	case correctPosition:
-		return "💓"
+		return "💚"
 	default:
 		return "💔"
 	}
@@ -39,4 +39,17 @@ func (fb feedback) String() string {
 		sb.WriteString(h.String())
 	}
 	return sb.String()
+}
+
+func (fb feedback) Equal(other feedback) bool {
+	if len(fb) != len(other) {
+		return false
+	}
+
+	for index, value := range fb {
+		if value != other[index] {
+			return false
+		}
+	}
+	return true
 }
